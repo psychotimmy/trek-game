@@ -16,6 +16,21 @@ def captured_output():
         sys.stdout = old_out
 
 class TestTrekGame(unittest.TestCase):
+    def test_addshields_good(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        result = game.addshields(1000, 500, 50)
+        self.assertEqual(result, (950, 550))
+
+    def test_addshields_too_much(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        result = game.addshields(1000, 500, 1100)
+        self.assertEqual(result, (1000, 500))
+
+    def test_addshields_negative(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        result = game.addshields(1000, 500, -50)
+        self.assertEqual(result, (1000, 500))
+
     def test_calcvector_dir_4(self):
         game = trek.TrekGame(max_speed=True, test_mode=True)
         result = game.calcvector(4)
