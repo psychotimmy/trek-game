@@ -20,6 +20,36 @@ def captured_output():
         sys.stderr = old_err
 
 class TestTrekGame(unittest.TestCase):
+	def test_calcvector_dir_4(self):
+		game = trek.TrekGame(max_speed=True, test_mode=True)
+		result = game.calcvector(4)
+		self.assertEqual(result, (0, -1))
+
+	def test_calcvector_dir_1(self):
+		game = trek.TrekGame(max_speed=True, test_mode=True)
+		result = game.calcvector(1)
+		self.assertEqual(result, (1, -1))
+
+	def test_calcvector_dir_2(self):
+		game = trek.TrekGame(max_speed=True, test_mode=True)
+		result = game.calcvector(2)
+		self.assertEqual(result, (1, 0))
+
+	def test_calcvector_dir_6(self):
+		game = trek.TrekGame(max_speed=True, test_mode=True)
+		result = game.calcvector(6)
+		self.assertEqual(result, (0, 1))
+
+	def test_calcvector_dir_9(self):
+		game = trek.TrekGame(max_speed=True, test_mode=True)
+		result = game.calcvector(9)
+		self.assertEqual(result, (-1, 1))
+
+	def test_calcvector_dir_8(self):
+		game = trek.TrekGame(max_speed=True, test_mode=True)
+		result = game.calcvector(8)
+		self.assertEqual(result, (-1, 0))
+
 	def test_join_upper(self):
 		game = trek.TrekGame(max_speed=True, test_mode=True)
 		result = game.join(100)
