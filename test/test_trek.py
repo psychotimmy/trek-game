@@ -245,27 +245,159 @@ class TestTrekGameGeneral(unittest.TestCase):
         self.assertEqual(star_count, 3)
         self.assertEqual(enterprise_count, 1)
         self.assertEqual(empty_space_count, 57)
+        #Don't check for the actual return here because it will be random
 
-    # def test_srs(self):
-    #     game = trek.TrekGame(max_speed=True, test_mode=True)
-    #     self.assertTrue(True)
+    def test_srs(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        sector = [\
+        0, 0, 0, 0, 0, 0, 2, 0, \
+        0, 0, 2, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 3, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 3, 0, \
+        0, 0, -200, 0, 0, 3, 0, 0, \
+        0, 0, 4, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0]
+        with captured_output() as (out):
+            result = game.srs(4, 2)
+            print_result = out.getvalue().strip()
+        expected = "That's not a direction the Enterprise can go in, captain!"
+        self.assertEqual(print_result, expected)
+        self.assertEqual(result, (2, 3, 7, 6))
 
-    # def test_helm_good(self):
-    #     game = trek.TrekGame(max_speed=True, test_mode=True)
-    #     galaxy = [\
-    #     104, 311, 1, 2, 5, 203, 304, 3, 103, 5, 5, 5, 312,\
-    #     13, 103, 2, 215, 11, 104, 303, 304, 312, 5, 301,\
-    #     103, 203, 305, 3, 104, 1, 204, 202, 14, 105, 304,\
-    #     302, 202, 305, 202, 204, 302, 12, 302, 201, 104,\
-    #     103, 301, 105, 313, 201, 3, 1, 104, 4, 102, 5,\
-    #     101, 204, 304, 3, 305, 3, 5, 2]
-    #     with captured_output() as (out):
-    #         result = game.helm(galaxy, 2, 3, 4,\
-    #                            5, 6, 7, 8)
-    #         print_result = out.getvalue().strip()
-    #     expected = "That's not a direction the Enterprise can go in, captain!"
-    #     self.assertEqual(print_result, expected)
-    #     self.assertEqual(result, (1, 2, 3, 4))
+    def test_helm_wrong_direction(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        sector = [\
+        0, 0, 0, 0, 0, 0, 2, 0, \
+        0, 0, 2, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 3, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 3, 0, \
+        0, 0, -200, 0, 0, 3, 0, 0, \
+        0, 0, 4, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0]
+        galaxy = [\
+        104, 311, 1, 2, 5, 203, 304, 3, 103, 5, 5, 5, 312,\
+        13, 103, 2, 215, 11, 104, 303, 304, 312, 5, 301,\
+        103, 203, 305, 3, 104, 1, 204, 202, 14, 105, 304,\
+        302, 202, 305, 202, 204, 302, 12, 302, 201, 104,\
+        103, 301, 105, 313, 201, 3, 1, 104, 4, 102, 5,\
+        101, 204, 304, 3, 305, 3, 5, 2]
+        with captured_output() as (out):
+            result = game.helm(galaxy=galaxy,
+                               sector=50,
+                               energy=15,
+                               cur_sec=sector,
+                               epos=5,
+                               stardate=42,
+                               test_direction=5,
+                               test_warp=50)
+            print_result = out.getvalue().strip()
+        expected = "That's not a direction the Enterprise can go in, captain!"
+        self.assertEqual(print_result, expected)
+        self.assertEqual(result, (50, 15, 5, 42))
+
+    def test_helm_warp_too_high(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        sector = [\
+        0, 0, 0, 0, 0, 0, 2, 0, \
+        0, 0, 2, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 3, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 3, 0, \
+        0, 0, -200, 0, 0, 3, 0, 0, \
+        0, 0, 4, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0]
+        galaxy = [\
+        104, 311, 1, 2, 5, 203, 304, 3, 103, 5, 5, 5, 312,\
+        13, 103, 2, 215, 11, 104, 303, 304, 312, 5, 301,\
+        103, 203, 305, 3, 104, 1, 204, 202, 14, 105, 304,\
+        302, 202, 305, 202, 204, 302, 12, 302, 201, 104,\
+        103, 301, 105, 313, 201, 3, 1, 104, 4, 102, 5,\
+        101, 204, 304, 3, 305, 3, 5, 2]
+        with captured_output() as (out):
+            result = game.helm(galaxy=galaxy,
+                               sector=50,
+                               energy=15,
+                               cur_sec=sector,
+                               epos=5,
+                               stardate=42,
+                               test_direction=7,
+                               test_warp=65)
+            print_result = out.getvalue().strip()
+        expected = "The engines canna take it, captain!"
+        self.assertEqual(print_result, expected)
+        self.assertEqual(result, (50, 15, 5, 42))
+
+    def test_helm_no_energy(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        sector = [\
+        0, 0, 0, 0, 0, 0, 2, 0, \
+        0, 0, 2, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 3, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 3, 0, \
+        0, 0, -200, 0, 0, 3, 0, 0, \
+        0, 0, 4, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0]
+        galaxy = [\
+        104, 311, 1, 2, 5, 203, 304, 3, 103, 5, 5, 5, 312,\
+        13, 103, 2, 215, 11, 104, 303, 304, 312, 5, 301,\
+        103, 203, 305, 3, 104, 1, 204, 202, 14, 105, 304,\
+        302, 202, 305, 202, 204, 302, 12, 302, 201, 104,\
+        103, 301, 105, 313, 201, 3, 1, 104, 4, 102, 5,\
+        101, 204, 304, 3, 305, 3, 5, 2]
+        with captured_output() as (out):
+            result = game.helm(galaxy=galaxy,
+                               sector=50,
+                               energy=15,
+                               cur_sec=sector,
+                               epos=5,
+                               stardate=42,
+                               test_direction=7,
+                               test_warp=16)
+            print_result = out.getvalue().strip()
+        expected = 'Too little energy left. Only  15  units remain'
+        self.assertEqual(print_result, expected)
+        self.assertEqual(result, (50, 15, 5, 42))
+
+    def test_helm_good(self):
+        """
+        galaxy=galaxy is a list of 64 ints valued 1-999
+        sector=sector is an int valued 0-63
+        energy=1500 is an int which starts at 3000 at beginning of game
+        cur_sec is Current Sector. E.g., a list of 64 numbers
+        epos is Enterprise Position. E.g., int valued 0-63
+        stardate is float valued 1000-1500
+        test_direction is a test int valued 1-9
+        test_warp is a test int valued 1-63
+        """
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        sector = [\
+        0, 0, 0, 0, 0, 0, 2, 0, \
+        0, 0, 2, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 3, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 3, 0, \
+        0, 0, -200, 0, 0, 3, 0, 0, \
+        0, 0, 4, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0]
+        galaxy = [\
+        104, 311, 1, 2, 5, 203, 304, 3, 103, 5, 5, 5, 312,\
+        13, 103, 2, 215, 11, 104, 303, 304, 312, 5, 301,\
+        103, 203, 305, 3, 104, 1, 204, 202, 14, 105, 304,\
+        302, 202, 305, 202, 204, 302, 12, 302, 201, 104,\
+        103, 301, 105, 313, 201, 3, 1, 104, 4, 102, 5,\
+        101, 204, 304, 3, 305, 3, 5, 2]
+        result = game.helm(galaxy=galaxy,
+                           sector=50,
+                           energy=1500,
+                           cur_sec=sector,
+                           epos=5,
+                           stardate=42,
+                           test_direction=7,
+                           test_warp=8)
+        self.assertEqual(result, (42, 1492, 5, 42.8))
 
     def test_helm_invalid(self):
         game = trek.TrekGame(max_speed=True, test_mode=True)
