@@ -151,6 +151,8 @@ class TrekGame(object):
                         condition=self.srs(current_sector,ent_position)
                         self.status(sector,stardate,condition,energy,torpedoes,
                         shields,klingons)
+            if test_arg is not None:
+                break # bail out of loop after one pass during testing
         # If we get here we've won if no klingons are left, but lost otherwise
         if klingons == 0:
             self.promotion()
