@@ -16,8 +16,6 @@ def captured_output():
         sys.stdout = old_out
 
 class TestTrekGameMain(unittest.TestCase):
-    #expected = '1 - Helm\n2 - Long Range Scan\n3 - Phasers\n4 \
-#- Photon Torpedoes\n5 - Shields\n6 - Resign'
     def test_main_help(self):
         game = trek.TrekGame(max_speed=True, test_mode=True)
         with captured_output() as (out):
