@@ -3,15 +3,13 @@ import time
 
 class TrekGame(object):
     def __init__(self, max_speed=False, test_mode=False):
-        self.half_second = 0.5
-        self.fifth_second = 0.2
+        self.second_coefficient = 1.0
         self.test_mode = test_mode
         if max_speed:
             self.make_max_speed()
 
     def make_max_speed(self):
-        self.half_second = 0
-        self.fifth_second = 0
+        self.second_coefficient = 0
 
     def test_input(self, prompt, input):
         if self.test_mode:
@@ -139,7 +137,7 @@ class TrekGame(object):
             if condition == "Red" and command != 0:
                 if random.randint(1,9)<6:
                     print "Red alert - Klingons attacking!"
-                    time.sleep(self.half_second)
+                    time.sleep(0.5 * self.second_coefficient)
                     damage=x*random.randint(1,50)
                     shields=shields-damage
                     print "Hit on shields: ",damage," energy units"
@@ -160,31 +158,31 @@ class TrekGame(object):
             self.lose()
         
     def status(self,sector,stardate,condition,energy,torpedoes,shields,klingons):
-        time.sleep(self.fifth_second)
+        time.sleep(0.2 * self.second_coefficient)
         print "\nStardate:           ",stardate 
-        time.sleep(self.fifth_second)
+        time.sleep(0.2 * self.second_coefficient)
         print "Condition:          ",condition
-        time.sleep(self.fifth_second)
+        time.sleep(0.2 * self.second_coefficient)
         print "Energy:             ",energy
-        time.sleep(self.fifth_second)
+        time.sleep(0.2 * self.second_coefficient)
         print "Photon torpedoes:   ",torpedoes
-        time.sleep(self.fifth_second)
+        time.sleep(0.2 * self.second_coefficient)
         print "Shields:            ",shields 
-        time.sleep(self.fifth_second)
+        time.sleep(0.2 * self.second_coefficient)
         print "Klingons in galaxy: ",klingons, "\n"
-        time.sleep(self.fifth_second)
+        time.sleep(0.2 * self.second_coefficient)
      
     def blurb(self):
         print "\nSpace ... the final frontier."
-        time.sleep(3*self.half_second)
+        time.sleep(1.5 * self.second_coefficient)
         print "These are the voyages of the starship Enterprise"
         print "Its five year mission ..."
-        time.sleep(5*self.half_second)
+        time.sleep(1.5 * self.second_coefficient)
         print "... to boldly go where no-one has gone before"
-        time.sleep(3*self.half_second)
+        time.sleep(1.5 * self.second_coefficient)
         print "You are Captain Kirk."
         print "Your mission is to destroy all of the Klingons in the galaxy."
-        time.sleep(5*self.half_second)
+        time.sleep(2.5 * self.second_coefficient)
            
     def promotion(self):
         print "\nYou have successfully completed your mission!"
@@ -237,7 +235,7 @@ class TrekGame(object):
         for i in range (0,64):
             if i%8 == 0:
                 print
-                time.sleep(self.fifth_second)
+                time.sleep(0.2 * self.second_coefficient)
             if current_sector[i]<0:
                 klingons=True
                 print ">!<",
@@ -324,14 +322,14 @@ class TrekGame(object):
     def lrs(self, galaxy,sector):
         # Print out the klingons/starbase/stars values from the
         # neighbouring eight sectors (and this one)
-        time.sleep(self.fifth_second)
+        time.sleep(0.2 * self.second_coefficient)
         print
         for i in range (-8,9,8):
             for j in range (-1,2):
                 # Join the ends of the galaxy together
                 sec=self.join(sector+j+i)
                 print "%03d" % galaxy[sec],
-                time.sleep(self.fifth_second)
+                time.sleep(0.2 * self.second_coefficient)
             print
         print
         
@@ -369,14 +367,14 @@ class TrekGame(object):
                             # Decrement sector klingons
                             ksec=ksec-1
                             print "Klingon destroyed!"
-                            time.sleep(self.fifth_second)
+                            time.sleep(0.2 * self.second_coefficient)
                         else:
                             # We have a hit on Enterprise's shields if not docked
                             if condition != "Docked":
                                 damage=int(power/dist)
                                 shields=shields-damage
                                 print "Hit on shields: ",damage," energy units"
-                                time.sleep(self.fifth_second)
+                                time.sleep(0.2 * self.second_coefficient)
         else:
             print "Not enough energy, Captain!"
         return(shields,energy,sector,ksec)
@@ -387,7 +385,7 @@ class TrekGame(object):
         else:
             direction=int(self.test_input('Fire in direction(1-4,6-9)? ', test_arg))
             if direction >=1 and direction <=9 and direction !=5:
-                time.sleep(self.fifth_second)
+                time.sleep(0.2 * self.second_coefficient)
                 # Work out the horizontal and vertical co-ordinates
                 # of the Enterprise in the current sector
                 # 0,0 is top left and 7,7 is bottom right
@@ -498,5 +496,5 @@ class TrekGame(object):
         print "6 - Resign"
     
 if __name__ == '__main__':
-    game = TrekGame(True)
+    game = TrekGame()
     game.main()
