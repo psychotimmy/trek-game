@@ -15,6 +15,65 @@ def captured_output():
     finally:
         sys.stdout = old_out
 
+class TestTrekGameMain(unittest.TestCase):
+    #expected = '1 - Helm\n2 - Long Range Scan\n3 - Phasers\n4 \
+#- Photon Torpedoes\n5 - Shields\n6 - Resign'
+    def test_main_help(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        with captured_output() as (out):
+            game.main(0)
+            result = out.getvalue().strip()
+        expected = "2 - Long Range Scan"
+        self.assertIn(expected, result)
+
+    def test_main_helm(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        self.assertRaises(TypeError, game.main, 1)
+        # the helm() function will raise a TypeError here
+        # because no test argument gets passed in. this is okay
+
+    def test_main_lrs(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        with captured_output() as (out):
+            game.main(2)
+            result = out.getvalue().strip()
+        reg_pattern = '[0-9][0-9][0-9] [0-9][0-9][0-9] [0-9][0-9][0-9]'
+        self.assertRegexpMatches(result, reg_pattern)
+
+    def test_main_phasers(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        self.assertRaises(TypeError, game.main, 3)
+        # the phasers() function will raise a TypeError here
+        # because no test argument gets passed in. this is okay
+
+    def test_main_photons(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        self.assertRaises(TypeError, game.main, 4)
+        # the photontorpedoes() function will raise a TypeError here
+        # because no test argument gets passed in. this is okay
+
+    def test_main_shields(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        self.assertRaises(TypeError, game.main, 5)
+        # the addshields() function will raise a TypeError here because
+        # no test argument gets passed in. this is okay
+
+    def test_main_quit(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        with captured_output() as (out):
+            game.main(6)
+            result = out.getvalue().strip()
+        expected = "You are relieved of duty"
+        self.assertIn(expected, result)
+
+    def test_main_unknown_command(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        with captured_output() as (out):
+            game.main(7)
+            result = out.getvalue().strip()
+        expected = "Command not recognised captain"
+        self.assertIn(expected, result)
+
 class TestTrekGameWeapons(unittest.TestCase):
     def test_phasers_destroy(self):
         game = trek.TrekGame(max_speed=True, test_mode=True)
@@ -177,15 +236,16 @@ class TestTrekGameWeapons(unittest.TestCase):
         self.assertEqual(print_result, expected)
         self.assertEqual(result, (0, 1, 3))
 
-
 class TestTrekGameGeneral(unittest.TestCase):
-    # def test_main(self):
-    #     game = trek.TrekGame(max_speed=True, test_mode=True)
-    #     self.assertTrue(True)
-
-    # def test_status(self):
-    #     game = trek.TrekGame(max_speed=True, test_mode=True)
-    #     self.assertTrue(True)
+    def test_status(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        with captured_output() as (out):
+            game.status(1, 2, 3, 4, 5, 6, 7)
+            result = out.getvalue().strip()
+        expected = 'Stardate:            2\nCondition:           3\nEnergy:   \
+           4\nPhoton torpedoes:    5\nShields:             6\nKlingons in \
+galaxy:  7'
+        self.assertEqual(result, expected)
 
     def test_blurb(self):
         game = trek.TrekGame(max_speed=True, test_mode=True)
@@ -247,7 +307,28 @@ class TestTrekGameGeneral(unittest.TestCase):
         self.assertEqual(empty_space_count, 57)
         #Don't check for the actual return here because it will be random
 
-    def test_srs(self):
+    def test_srs_without_klingon(self):
+        game = trek.TrekGame(max_speed=True, test_mode=True)
+        sector = [\
+        0, 0, 0, 0, 0, 0, 2, 0, \
+        0, 0, 2, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 3, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 3, 0, \
+        0, 0, 0, 0, 0, 3, 0, 0, \
+        0, 0, 4, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0]
+        with captured_output() as (out):
+            result = game.srs(sector, 2)
+            print_result = out.getvalue().strip()
+        expected = '.   .   .   .   .   .  <O>  . \n .   .  <O>  .   .   .   .\
+   . \n .   .   .   .   *   .   .   . \n .   .   .   .   .   .   .   . \n .   \
+.   .   .   .   .   *   . \n .   .   .   .   .   *   .   . \n .   .  -O-  .   \
+.   .   .   . \n .   .   .   .   .   .   .   .'
+        self.assertEqual(print_result, expected)
+        self.assertEqual(result, "Green")
+
+    def test_srs_with_klingon(self):
         game = trek.TrekGame(max_speed=True, test_mode=True)
         sector = [\
         0, 0, 0, 0, 0, 0, 2, 0, \
@@ -259,11 +340,14 @@ class TestTrekGameGeneral(unittest.TestCase):
         0, 0, 4, 0, 0, 0, 0, 0, \
         0, 0, 0, 0, 0, 0, 0, 0]
         with captured_output() as (out):
-            result = game.srs(4, 2)
+            result = game.srs(sector, 2)
             print_result = out.getvalue().strip()
-        expected = "That's not a direction the Enterprise can go in, captain!"
+        expected = '.   .   .   .   .   .  <O>  . \n .   .  <O>  .   .   .   .\
+   . \n .   .   .   .   *   .   .   . \n .   .   .   .   .   .   .   . \n .   \
+.   .   .   .   .   *   . \n .   .  >!<  .   .   *   .   . \n .   .  -O-  .   \
+.   .   .   . \n .   .   .   .   .   .   .   .'
         self.assertEqual(print_result, expected)
-        self.assertEqual(result, (2, 3, 7, 6))
+        self.assertEqual(result, "Red")
 
     def test_helm_wrong_direction(self):
         game = trek.TrekGame(max_speed=True, test_mode=True)
